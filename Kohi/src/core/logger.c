@@ -3,7 +3,7 @@
 void log_output(enum log_level level, const char* messageformat, ...) {
 	const char* level_string[6] = { "[FATAL] ", "[ERROR] ", "[WARNING] ",  "[INFO] ",  "[DEBUG] ", "[TRACE] ", };
 
-	b8 is_error = level < LOG_LEVEL_WARNING;
+	b8 is_error = level < LOG_LEVEL_WARN;
 
 	char buffer[LOG_MESSAGE_LENGTH];
 	char out_message[LOG_MESSAGE_LENGTH];

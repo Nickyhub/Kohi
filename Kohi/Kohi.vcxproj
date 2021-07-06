@@ -88,16 +88,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\containers\darray.c" />
     <ClCompile Include="src\core\application.c" />
+    <ClCompile Include="src\core\event.c" />
+    <ClCompile Include="src\core\kmemory.c" />
     <ClCompile Include="src\core\logger.c" />
     <ClCompile Include="src\platform\platform_win32.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\containers\darray.h" />
     <ClInclude Include="src\core\application.h" />
     <ClInclude Include="src\core\asserts.h" />
+    <ClInclude Include="src\core\event.h" />
+    <ClInclude Include="src\core\kmemory.h" />
     <ClInclude Include="src\core\logger.h" />
     <ClInclude Include="src\defines.h" />
     <ClInclude Include="src\entry.h" />
+    <ClInclude Include="src\gametypes.h" />
     <ClInclude Include="src\platform\platform.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

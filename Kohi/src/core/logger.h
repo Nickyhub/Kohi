@@ -3,6 +3,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include "platform/platform.h"
+#include "defines.h"
 
 #ifdef _DEBUG
 #define LOG_MESSAGE_LENGTH 1000
@@ -17,13 +18,13 @@
 enum log_level {
 	LOG_LEVEL_FATAL,
 	LOG_LEVEL_ERROR, 
-	LOG_LEVEL_WARNING,
+	LOG_LEVEL_WARN,
 	LOG_LEVEL_INFO,
 	LOG_LEVEL_DEBUG,
 	LOG_LEVEL_TRACE	
 };
 
-void log_output(enum log_level level, const char* messageformat, ...);
+KAPI void log_output(enum log_level level, const char* messageformat, ...);
 b8 initialize_logging();
 
 
@@ -36,9 +37,9 @@ b8 initialize_logging();
 #endif
 
 #if LOG_WARN_ENABLED
-#define EN_WARNING(x, ...)	log_output(LOG_LEVEL_WARNING, x, ##__VA_ARGS__)	
+#define EN_WARN(x, ...)	log_output(LOG_LEVEL_WARN, x, ##__VA_ARGS__)	
 #else 
-#define EN_WARNING(x, ...)
+#define EN_WARN(x, ...)
 #endif
 
 #if LOG_DEBUG_ENABLED

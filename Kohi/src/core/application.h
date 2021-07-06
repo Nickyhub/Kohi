@@ -1,5 +1,6 @@
 #pragma once
 #include "defines.h"
+struct game;
 
 typedef struct application_config {
 	i16 start_pos_x;
@@ -10,5 +11,5 @@ typedef struct application_config {
 	const char* name;
 } application_config;
 
-b8 application_create(application_config* config);
-b8 application_run();
+b8 KAPI application_create(struct game* game_inst);
+b8 KAPI application_run();

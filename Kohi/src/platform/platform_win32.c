@@ -1,5 +1,6 @@
 #include "platform.h"
 #include "core/logger.h"
+#include <string.h>
 
 #if KPLATFORM_WINDOWS
 #include <windows.h>
@@ -33,7 +34,7 @@ b8 platform_startup(platform_state* plat_state, const char* app_name, int x, int
 	wc.lpszClassName = "kohi_window_class";
 
 	if (!RegisterClassA(&wc)) {
-		MessageBox(0, "Window registration failede", "Error", MB_ICONEXCLAMATION | MB_OK);
+		MessageBox(0, "Window registration failed", "Error", MB_ICONEXCLAMATION | MB_OK);
 		return FALSE;
 	}
 
