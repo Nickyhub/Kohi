@@ -27,16 +27,28 @@
     <ClCompile Include="src\core\kmemory.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\core\event.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\containers\darray.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\core\input.h">
+    <ClCompile Include="src\core\input.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\core\input.c">
+    <ClCompile Include="src\core\event.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\clock.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\renderer\renderer_backend.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\renderer\renderer_frontend.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\renderer\vulkan\vulkan_backend.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\kstring.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -65,11 +77,40 @@
     <ClInclude Include="src\core\kmemory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\core\event.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\containers\darray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\core\input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\event.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\clock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\renderer_frontend.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\renderer_backend.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\vulkan\vulkan_backend.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\kstring.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\vulkan\vulkan_platform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\renderer\renderer_types.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="src\renderer\vulkan\vulkan_types.inl">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

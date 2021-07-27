@@ -97,12 +97,13 @@ char* get_memory_usage_str() {
 		}
 		else {
 			unit[0] = 'B';
-			unit[1] = '0';
+			unit[1] = 0;
 			amount = (float)stats.tagged_allocations[i];
 		}
-		i32 length = snprintf(buffer + offset, 3000, "%s: %.2f%s\n", memory_tag_strings[i], amount, unit);
+		i32 length = snprintf(buffer + offset, 3000, "  %s: %.2f%s\n", memory_tag_strings[i], amount, unit);
 		offset += length;
 	}
-	char* out_string = _strdup(buffer);
-	return out_string;
+	return buffer;
+	/*char* out_string = _strdup(buffer);
+	return out_string;*/
 }

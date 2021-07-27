@@ -57,15 +57,17 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;EN_EXPORT</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;EN_EXPORT;_DEBUG</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;$(SolutionDir)vendor\Vulkan1.2.176.1\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)vendor\Vulkan1.2.176.1\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -78,36 +80,53 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;$(SolutionDir)vendor\Vulkan1.2.176.1\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)vendor\Vulkan1.2.176.1\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\containers\darray.c" />
     <ClCompile Include="src\core\application.c" />
+    <ClCompile Include="src\core\clock.c" />
     <ClCompile Include="src\core\event.c" />
     <ClCompile Include="src\core\input.c" />
-    <ClCompile Include="src\core\input.h" />
     <ClCompile Include="src\core\kmemory.c" />
+    <ClCompile Include="src\core\kstring.c" />
     <ClCompile Include="src\core\logger.c" />
     <ClCompile Include="src\platform\platform_win32.c" />
+    <ClCompile Include="src\renderer\renderer_backend.c" />
+    <ClCompile Include="src\renderer\renderer_frontend.c" />
+    <ClCompile Include="src\renderer\vulkan\vulkan_backend.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\containers\darray.h" />
     <ClInclude Include="src\core\application.h" />
     <ClInclude Include="src\core\asserts.h" />
+    <ClInclude Include="src\core\clock.h" />
     <ClInclude Include="src\core\event.h" />
+    <ClInclude Include="src\core\input.h" />
     <ClInclude Include="src\core\kmemory.h" />
+    <ClInclude Include="src\core\kstring.h" />
     <ClInclude Include="src\core\logger.h" />
     <ClInclude Include="src\defines.h" />
     <ClInclude Include="src\entry.h" />
     <ClInclude Include="src\gametypes.h" />
     <ClInclude Include="src\platform\platform.h" />
+    <ClInclude Include="src\renderer\renderer_backend.h" />
+    <ClInclude Include="src\renderer\renderer_frontend.h" />
+    <ClInclude Include="src\renderer\vulkan\vulkan_backend.h" />
+    <ClInclude Include="src\renderer\vulkan\vulkan_platform.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\renderer\renderer_types.inl" />
+    <None Include="src\renderer\vulkan\vulkan_types.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

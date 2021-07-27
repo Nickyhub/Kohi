@@ -2,6 +2,7 @@
 #include "core/logger.h"
 #include <string.h>
 #include "core/input.h"
+#include "containers/darray.h"
 
 #if KPLATFORM_WINDOWS
 #include <windows.h>
@@ -154,6 +155,10 @@ f64 platform_get_absolute_time() {
 
 void platform_sleep(unsigned long long ms) {
 	Sleep((DWORD) ms);
+}
+
+void platform_get_required_extension_names(const char*** names_darray) {
+	darray_push(*names_darray, "VK_KHR_win32_surface");
 }
 
 
