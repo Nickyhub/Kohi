@@ -22,11 +22,13 @@ b8 vulkan_renderer_backend_initialize(renderer_backend* backend, const char* app
 	create_info.pApplicationInfo = &app_info;
 
 	const char** required_extensions = darray_create(const char*);
-	darray_push(required_extensions, VK_KHR_SURFACE_EXTENSION_NAME);
+	char** extension_name = &VK_KHR_SURFACE_EXTENSION_NAME;
+	darray_push(required_extensions, extension_name);
 	platform_get_required_extension_names(&required_extensions);
 
 #if defined(_DEBUG) 
-	darray_push(required_extensions, VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+	extension_name = &VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
+	darray_push(required_extensions, extension_name);
 	EN_DEBUG("Required extensions: ");
 	u32 length = darray_length(required_extensions);
 	for (u32 i = 0; i < length; ++i) {
@@ -43,13 +45,18 @@ b8 vulkan_renderer_backend_initialize(renderer_backend* backend, const char* app
 	EN_INFO("Validation layers enabled. Enumeratin...");
 
 	required_validation_layer_names = darray_create(const char*);
-	darray_push(required_validation_layer_names, "VK_LAYER_KHRONOS_validation");
+	extension_name = &"VK_LAYER_KHRONOS_validation";
+	darray_push(required_validation_layer_names, extension_name);
 	required_validation_layer_count = darray_length(required_validation_layer_names);
 
 	u32 available_layer_count = 0;
 	VK_CHECK(vkEnumerateInstanceLayerProperties(&available_layer_count, 0));
 	VkLayerProperties* available_layers = darray_reserve(VkLayerProperties, available_layer_count);
 	VK_CHECK(vkEnumerateInstanceLayerProperties(&available_layer_count, available_layers));
+
+	for (int i = 0; i < available_layer_count; i++) {
+		EN_DEBUG(available_layers[i].layerName);
+	}
 
 	for (u32 i = 0; i < required_validation_layer_count; ++i) {
 		EN_INFO("Searching for layer: %s...", required_validation_layer_names[i]);
@@ -73,11 +80,7 @@ b8 vulkan_renderer_backend_initialize(renderer_backend* backend, const char* app
 	create_info.enabledLayerCount = required_validation_layer_count;
 	create_info.ppEnabledLayerNames = required_validation_layer_names;
 
-	VkResult result = vkCreateInstance(&create_info, context.allocator, &context.instance);
-	if (result != VK_SUCCESS) {
-		EN_ERROR("vkCreateInstance failed with result: %u", result);
-		return FALSE;
-	}
+	VK_CHECK(vkCreateInstance(&create_info, context.allocator, &context.instance));
 
 	EN_INFO("Vulkan renderer initialize successful!");
 	return TRUE;

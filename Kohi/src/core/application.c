@@ -68,7 +68,7 @@ b8 application_create(game* game_inst) {
 		return FALSE;
 	}
 
-	app_state.game_inst->on_resize(app_state.game_inst, app_state.width, app_state.height);
+	//app_state.game_inst->on_resize(app_state.game_inst, app_state.width, app_state.height);
 
 	initialized = TRUE;
 	return TRUE;

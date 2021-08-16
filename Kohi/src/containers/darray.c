@@ -17,22 +17,22 @@ void _darray_destroy(void* array) {
 	u64* header = (u64*)array - DARRAY_FIELD_LENGTH;
 	u64 header_size = DARRAY_FIELD_LENGTH * sizeof(u64);
 	u64 total_size = header_size + header[DARRAY_CAPACITY] * header[DARRAY_STRIDE];
-	kfree(array, total_size, MEMORY_TAG_ARRAY);
+	kfree(header, total_size, MEMORY_TAG_ARRAY);
 }
 
-KAPI u64 _darray_field_get(void* array, u64 field)
+u64 _darray_field_get(void* array, u64 field)
 {
 	u64* header = (u64*)array - DARRAY_FIELD_LENGTH;
 	return header[field];
 }
 
-KAPI void _darray_field_set(void* array, u64 field, u64 value)
+void _darray_field_set(void* array, u64 field, u64 value)
 {
 	u64* header = (u64*)array - DARRAY_FIELD_LENGTH;
 	header[field] = value;
 }
 
-KAPI void* _darray_resize(void* array)
+void* _darray_resize(void* array)
 {
 	u64 length = darray_length(array);
 	u64 stride = darray_stride(array);
@@ -45,10 +45,11 @@ KAPI void* _darray_resize(void* array)
 	return temp;
 }
 
-KAPI void* _darray_push(void* array, const void* value)
+void* _darray_push(void* array, const void* value)
 {
 	u64 length = darray_length(array);
 	u64 stride = darray_stride(array);
+	auto a = darray_capacity(array);
 	if (length >= darray_capacity(array)) {
 		array = _darray_resize(array);
 	}
@@ -60,7 +61,7 @@ KAPI void* _darray_push(void* array, const void* value)
 	return array;
 }
 
-KAPI void _darray_pop(void* array, void* dest)
+void _darray_pop(void* array, void* dest)
 {
 	u64 length = darray_length(array);
 	u64 stride = darray_stride(array);

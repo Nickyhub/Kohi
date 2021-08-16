@@ -106,11 +106,15 @@ b8 platform_pump_messages(platform_state* plat_state) {
 }
 
 void* platform_allocate(unsigned long long size, b8 aligned) {
-	return malloc(size);
+	void* block = malloc(size);
+	return block;
 }
 
 void  platform_free(void* block, b8 aligned) {
-	free(block);
+	if (block != NULL) {
+		free(block);
+		block = NULL;
+	}
 }
 
 void* platform_zero_memory(void* block, unsigned long long size) {
@@ -158,7 +162,8 @@ void platform_sleep(unsigned long long ms) {
 }
 
 void platform_get_required_extension_names(const char*** names_darray) {
-	darray_push(*names_darray, "VK_KHR_win32_surface");
+	char* extension_name = &"VK_KHR_win32_surface";
+	darray_push(*names_darray, extension_name);
 }
 
 
