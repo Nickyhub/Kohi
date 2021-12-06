@@ -12,6 +12,7 @@ b8 create_game(game* out_game) {
 	out_game->initialize = game_initialize;
 	out_game->on_resize = game_on_resize;
 
-	out_game->state = kallocate(sizeof(game_state), FALSE);
-	return TRUE;
+	out_game->state = kallocate(sizeof(game_state), false);
+	out_game->application_state = 0;
+	return true;
 }

@@ -1,8 +1,5 @@
 #pragma once
-#include <stdio.h>
-#include <stdarg.h>
-#include <string.h>
-#include "platform/platform.h"
+
 #include "defines.h"
 
 #ifdef _DEBUG
@@ -24,9 +21,9 @@ enum log_level {
 	LOG_LEVEL_TRACE	
 };
 
+b8 initialize_logging(u64* memory_requirement, void* state);
+void shutdown_logging(void* state);
 KAPI void log_output(enum log_level level, const char* messageformat, ...);
-b8 initialize_logging();
-
 
 #ifndef EN_FATAL
 #define EN_FATAL(x, ...)	log_output(LOG_LEVEL_FATAL, x, ##__VA_ARGS__)	

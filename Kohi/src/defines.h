@@ -18,7 +18,7 @@ typedef double f64;
 
 // Boolean types
 typedef int b32;
-typedef char b8;
+typedef _Bool b8;
 
 // Properly define static assertions.
 #if defined(__clang__) || defined(__gcc__)
@@ -41,8 +41,10 @@ STATIC_ASSERT(sizeof(i64) == 8, "Expected i64 to be 8 bytes.");
 STATIC_ASSERT(sizeof(f32) == 4, "Expected f32 to be 4 bytes.");
 STATIC_ASSERT(sizeof(f64) == 8, "Expected f64 to be 8 bytes.");
 
-#define TRUE 1
-#define FALSE 0
+#define true 1
+#define false 0
+
+#define INVALID_ID 4294967295U
 
 // Platform detection
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) 
@@ -82,7 +84,7 @@ STATIC_ASSERT(sizeof(f64) == 8, "Expected f64 to be 8 bytes.");
 #error "Unknown platform!"
 #endif
 
-#ifdef EN_EXPORT
+#ifdef KEXPORT
 // Exports
 #ifdef _MSC_VER
 #define KAPI __declspec(dllexport)
@@ -96,4 +98,15 @@ STATIC_ASSERT(sizeof(f64) == 8, "Expected f64 to be 8 bytes.");
 #else
 #define KAPI
 #endif
+#endif
+
+#define EN_CLAMP(value, min, max) (value <= min) ? min : (value>= max) ? max : value
+
+//Inlining
+#ifdef _MSC_VER
+#define KINLINE __forceinline
+#define KNOINLINE __declspec(noinline)
+#else 
+#define KINLINE static inline
+#define KNOINLINE
 #endif

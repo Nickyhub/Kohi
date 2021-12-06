@@ -12,29 +12,42 @@
 #include <vulkan/vulkan_win32.h>
 #include "renderer/vulkan/vulkan_types.inl"
 
-typedef struct internal_state {
+typedef struct platform_state {
 	HINSTANCE h_instance;
 	HWND hwnd;
 	VkSurfaceKHR surface;
-} internal_state;
+} platform_state;
+
+static platform_state* state_ptr;
 
 static f64 clock_frequency;
 static LARGE_INTEGER start_time;
 
 LRESULT CALLBACK win32_process_message(HWND hwnd, u32 message, WPARAM w_param, LPARAM l_param);
 
-b8 platform_startup(platform_state* plat_state, const char* app_name, int x, int y, int width, int height) {
-	plat_state->internal_state = malloc(sizeof(internal_state));
-	internal_state* state = (internal_state*)plat_state->internal_state;
-	state->h_instance = GetModuleHandleA(0);
+b8 platform_system_startup(
+	u64* memory_requirement,
+	void* state,
+	const char* application_name,
+	i32 x,
+	i32 y,
+	i32 width,
+	i32 height) {
 
-	HICON icon = LoadIcon(state->h_instance, IDI_APPLICATION);
+	*memory_requirement = sizeof(platform_state);
+	if (state == 0) {
+		return true;
+	}
+	state_ptr = state;
+	state_ptr->h_instance = GetModuleHandleA(0);
+
+	HICON icon = LoadIcon(state_ptr->h_instance, IDI_APPLICATION);
 	WNDCLASSA wc;
 	memset(&wc, 0, sizeof(wc));
 	wc.style = CS_DBLCLKS;
 	wc.lpfnWndProc = win32_process_message;
 	wc.cbClsExtra = 0;
-	wc.hInstance = state->h_instance;
+	wc.hInstance = state_ptr->h_instance;
 	wc.hIcon = icon;
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wc.hbrBackground = NULL;
@@ -42,7 +55,7 @@ b8 platform_startup(platform_state* plat_state, const char* app_name, int x, int
 
 	if (!RegisterClassA(&wc)) {
 		MessageBox(0, "Window registration failed", "Error", MB_ICONEXCLAMATION | MB_OK);
-		return FALSE;
+		return false;
 	}
 
 	u32 window_x = x;
@@ -68,35 +81,33 @@ b8 platform_startup(platform_state* plat_state, const char* app_name, int x, int
 	window_width += border_rect.right - border_rect.left;
 	window_height += border_rect.bottom - border_rect.top;
 
-	HWND handle = CreateWindowExA(window_ex_style, wc.lpszClassName, app_name, window_style, window_x, window_y, window_width, window_height, 0, 0, state->h_instance, 0);
+	HWND handle = CreateWindowExA(window_ex_style, wc.lpszClassName, application_name, window_style, window_x, window_y, window_width, window_height, 0, 0, state_ptr->h_instance, 0);
 
 	if (handle == 0) {
 		MessageBoxA(NULL, "Window creation failed!", "Error!", MB_ICONEXCLAMATION | MB_OK);
 
 		EN_FATAL("Window creation Failed");
-		return FALSE;
+		return false;
 	}
 	else {
-		state->hwnd = handle;
+		state_ptr->hwnd = handle;
 	}
 
 	b32 should_activate = 1;
 	i32 show_window_command_flags = should_activate ? SW_SHOW : SW_SHOWNOACTIVATE;
-	ShowWindow(state->hwnd, show_window_command_flags);
+	ShowWindow(state_ptr->hwnd, show_window_command_flags);
 
 	LARGE_INTEGER frequency;
 	QueryPerformanceFrequency(&frequency);
 	clock_frequency = 1.0f / (f64)frequency.QuadPart;
 	QueryPerformanceCounter(&start_time);
-	return TRUE;
+	return true;
 }
 
-void platform_shutdown(platform_state* plat_state) {
-	internal_state* state = (internal_state*)plat_state->internal_state;
-
-	if (state->hwnd) {
-		DestroyWindow(state->hwnd);
-		state->hwnd = 0;
+void platform_system_shutdown(platform_state* plat_state) {
+	if (state_ptr && state_ptr->hwnd) {
+		DestroyWindow(state_ptr->hwnd);
+		state_ptr->hwnd = 0;
 	}
 }
 
@@ -107,7 +118,7 @@ b8 platform_pump_messages(platform_state* plat_state) {
 		DispatchMessageA(&message);
 	}
 
-	return TRUE;
+	return true;
 }
 
 void* platform_allocate(unsigned long long size, b8 aligned) {
@@ -172,20 +183,23 @@ void platform_get_required_extension_names(const char*** names_darray) {
 }
 
 b8 platform_create_vulkan_surface(platform_state* plat_state, vulkan_context* context) {
-	internal_state* state = (internal_state*)plat_state->internal_state;
+	if (!state_ptr) {
+		return false;
+	}
+
 
 	VkWin32SurfaceCreateInfoKHR create_info = { VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR };
-	create_info.hinstance = state->h_instance;
-	create_info.hwnd = state->hwnd;
+	create_info.hinstance = state_ptr->h_instance;
+	create_info.hwnd = state_ptr->hwnd;
 
-	VkResult result = vkCreateWin32SurfaceKHR(context->instance, &create_info, context->allocator, &state->surface);
+	VkResult result = vkCreateWin32SurfaceKHR(context->instance, &create_info, context->allocator, &state_ptr->surface);
 
 	if (result != VK_SUCCESS) {
 		EN_FATAL("Vulkan surface creation failed.");
-		return FALSE;
+		return false;
 	}
-	context->surface = state->surface;
-	return TRUE;
+	context->surface = state_ptr->surface;
+	return true;
 }
 
 
@@ -197,17 +211,21 @@ LRESULT CALLBACK win32_process_message(HWND hwnd, u32 message, WPARAM w_param, L
 	case WM_CLOSE:
 		event_context data = {0};
 		event_fire(EVENT_CODE_APPLICATION_QUIT, 0, data);
-		return 0;
-		return 0;
+		return true;
+		
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;
 	case WM_SIZE: {
-		//RECT r;
-		//GetClientRect(hwnd, &r);
-		//u32 width = r.right - r.left;
-		//u32 height = r.bottom - r.top;
+		RECT r;
+		GetClientRect(hwnd, &r);
+		u32 width = r.right - r.left;
+		u32 height = r.bottom - r.top;
 
+		event_context context;
+		context.data.u16[0] = (u16)width;
+		context.data.u16[1] = (u16)height;
+		event_fire(EVENT_CODE_RESIZED, 0, context);
 	} break;
 
 	case WM_KEYDOWN:
@@ -216,6 +234,33 @@ LRESULT CALLBACK win32_process_message(HWND hwnd, u32 message, WPARAM w_param, L
 	case WM_SYSKEYUP: {
 		b8 pressed = (message == WM_KEYDOWN || message == WM_SYSKEYDOWN);
 		keys key = (u16)w_param;
+
+		//Alt key
+		if (w_param == VK_MENU) {
+			if (GetKeyState(VK_RMENU) & 0x8000) {
+				key = KEY_RALT;
+			}
+			else if (GetKeyState(VK_LMENU) & 0x8000) {
+				key = KEY_LALT;
+			}
+		}
+		else if (w_param == VK_SHIFT) {
+			if (GetKeyState(VK_RSHIFT) & 0x8000) {
+				key = KEY_RSHIFT;
+			}
+			else if (GetKeyState(VK_LSHIFT) & 0x8000) {
+				key = KEY_LSHIFT;
+			}
+		}
+		else if (w_param == VK_CONTROL) {
+			if (GetKeyState(VK_RCONTROL) & 0x8000) {
+				key = KEY_RCONTROL;
+			}
+			else if (GetKeyState(VK_LCONTROL) & 0x8000) {
+				key = KEY_LCONTROL;
+			}
+		}
+
 		input_process_key(key, pressed);
 
 	} break;

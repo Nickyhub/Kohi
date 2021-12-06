@@ -69,6 +69,11 @@
       <AdditionalLibraryDirectories>D:\Dev\Projekte\_Libraries\Vulkan\1.2.182.0\Lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>cd D:\Dev\Projekte\Kohi\
+post-build.bat
+PAUSE</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -90,6 +95,11 @@
       <AdditionalLibraryDirectories>D:\Dev\Projekte\_Libraries\Vulkan\1.2.182.0\Lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>cd D:\Dev\Projekte\Kohi\
+post-build.bat
+PAUSE</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\containers\darray.c" />
@@ -100,11 +110,25 @@
     <ClCompile Include="src\core\kmemory.c" />
     <ClCompile Include="src\core\kstring.c" />
     <ClCompile Include="src\core\logger.c" />
+    <ClCompile Include="src\math\kmath.c" />
+    <ClCompile Include="src\memory\linear_allocator.c" />
+    <ClCompile Include="src\platform\filesystem.c" />
     <ClCompile Include="src\platform\platform_win32.c" />
     <ClCompile Include="src\renderer\renderer_backend.c" />
     <ClCompile Include="src\renderer\renderer_frontend.c" />
+    <ClCompile Include="src\renderer\vulkan\shaders\vulkan_object_shader.c" />
     <ClCompile Include="src\renderer\vulkan\vulkan_backend.c" />
+    <ClCompile Include="src\renderer\vulkan\vulkan_buffer.c" />
+    <ClCompile Include="src\renderer\vulkan\vulkan_command_buffer.c" />
     <ClCompile Include="src\renderer\vulkan\vulkan_device.c" />
+    <ClCompile Include="src\renderer\vulkan\vulkan_fence.c" />
+    <ClCompile Include="src\renderer\vulkan\vulkan_framebuffer.c" />
+    <ClCompile Include="src\renderer\vulkan\vulkan_images.c" />
+    <ClCompile Include="src\renderer\vulkan\vulkan_pipeline.c" />
+    <ClCompile Include="src\renderer\vulkan\vulkan_renderpass.c" />
+    <ClCompile Include="src\renderer\vulkan\vulkan_shader_utils.c" />
+    <ClCompile Include="src\renderer\vulkan\vulkan_swapchain.c" />
+    <ClCompile Include="src\renderer\vulkan\vulkan_utils.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\containers\darray.h" />
@@ -119,12 +143,29 @@
     <ClInclude Include="src\defines.h" />
     <ClInclude Include="src\entry.h" />
     <ClInclude Include="src\gametypes.h" />
+    <ClInclude Include="src\math\kmath.h" />
+    <ClInclude Include="src\math\math_types.h" />
+    <ClInclude Include="src\memory\linear_allocator.h" />
+    <ClInclude Include="src\platform\filesystem.h" />
     <ClInclude Include="src\platform\platform.h" />
     <ClInclude Include="src\renderer\renderer_backend.h" />
     <ClInclude Include="src\renderer\renderer_frontend.h" />
+    <ClInclude Include="src\renderer\vulkan\shaders\vulkan_object_shader.h" />
     <ClInclude Include="src\renderer\vulkan\vulkan_backend.h" />
+    <ClInclude Include="src\renderer\vulkan\vulkan_buffer.h" />
+    <ClInclude Include="src\renderer\vulkan\vulkan_command_buffer.h" />
     <ClInclude Include="src\renderer\vulkan\vulkan_device.h" />
+    <ClInclude Include="src\renderer\vulkan\vulkan_fence.h" />
+    <ClInclude Include="src\renderer\vulkan\vulkan_framebuffer.h" />
+    <ClInclude Include="src\renderer\vulkan\vulkan_image.h" />
+    <ClInclude Include="src\renderer\vulkan\vulkan_pipeline.h" />
     <ClInclude Include="src\renderer\vulkan\vulkan_platform.h" />
+    <ClInclude Include="src\renderer\vulkan\vulkan_renderpass.h" />
+    <ClInclude Include="src\renderer\vulkan\vulkan_shader_utils.h" />
+    <ClInclude Include="src\renderer\vulkan\vulkan_swapchain.h" />
+    <ClInclude Include="src\renderer\vulkan\vulkan_utils.h" />
+    <ClInclude Include="src\resources\resource_types.h" />
+    <ClInclude Include="src\vendor\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\renderer\renderer_types.inl" />
