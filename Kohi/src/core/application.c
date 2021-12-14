@@ -12,6 +12,9 @@
 
 #include "renderer/renderer_frontend.h"
 
+//Systems
+#include "systems/texture_system.h"
+
 typedef struct application_state {
 	game* game_inst;
 	b8 is_running;
@@ -40,7 +43,8 @@ typedef struct application_state {
 	u64 renderer_system_memory_requirement;
 	void* renderer_system_state;
 
-
+	u64 texture_system_memory_requirement;
+	void* texture_system_state;
 } application_state;
 
 static application_state* app_state;
@@ -70,9 +74,9 @@ b8 application_create(game* game_inst) {
 
 
 	//Memory
-	initialize_memory(&app_state->memory_system_memory_requirement, 0);
+	memory_system_initialize(&app_state->memory_system_memory_requirement, 0);
 	app_state->memory_system_state = linear_allocator_allocate(&app_state->systems_allocator, app_state->memory_system_memory_requirement);
-	initialize_memory(&app_state->memory_system_memory_requirement, app_state->memory_system_state);
+	memory_system_initialize(&app_state->memory_system_memory_requirement, app_state->memory_system_state);
 
 	//Logging
 	initialize_logging(&app_state->logging_system_memory_requirement, 0);
@@ -116,6 +120,17 @@ b8 application_create(game* game_inst) {
 		return false;
 	}
 
+	//Texture system.
+	texture_system_config texture_sys_config;
+	texture_sys_config.max_texture_count = 65536;
+	texture_system_initalize(&app_state->texture_system_memory_requirement, 0, texture_sys_config);
+	app_state->texture_system_state = linear_allocator_allocate(&app_state->systems_allocator, app_state->texture_system_memory_requirement);
+	if (!texture_system_initalize(&app_state->texture_system_memory_requirement, &app_state->texture_system_state, texture_sys_config)) {
+		EN_FATAL("Failed to initialize texture system. Application cannot continue.");
+		return false;
+	}
+
+	//Initialize the game
 	if (!app_state->game_inst->initialize(app_state->game_inst)) {
 		EN_FATAL("Game failed to initialize!");
 		return false;
@@ -195,6 +210,7 @@ b8 application_run() {
 	event_unregister(EVENT_CODE_RESIZED, 0, application_on_resized);
 
 	input_system_shutdown(&app_state->input_system_state);
+	texture_system_shutdown(&app_state->texture_system_state);
 	renderer_system_shutdown(&app_state->renderer_system_state);
 	platform_system_shutdown(&app_state->platform_system_state);
 	memory_system_shutdown(&app_state->memory_system_state);

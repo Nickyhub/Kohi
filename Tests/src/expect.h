@@ -1,6 +1,6 @@
 #pragma once
 #include <core/logger.h>
-//#include <math/kmath.h>
+#include <math/kmath.h>
 
 #define expect_should_be(expected, actual)																\
 if (actual != expected) {																				\
@@ -10,7 +10,7 @@ if (actual != expected) {																				\
 
 #define expect_should_not_be(expected, actual)																	\
 if (actual == expected) {																						\
-	EN_ERROR("--> Expected %d != %d, but they are eqal. File: %s:%d", expected, actual, __FILE__, __LINE__);	\
+	EN_ERROR("--> Expected %d != %d, but they are equal. File: %s:%d", expected, actual, __FILE__, __LINE__);	\
 	return false;																								\
 }
 

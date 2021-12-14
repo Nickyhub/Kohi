@@ -149,6 +149,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\containers\hashtable_tests.c" />
     <ClCompile Include="src\main.c" />
     <ClCompile Include="src\memory\linear_allocator_tests.c" />
     <ClCompile Include="src\test_manager.c" />
@@ -159,6 +160,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\containers\hashtable_tests.h" />
     <ClInclude Include="src\expect.h" />
     <ClInclude Include="src\memory\linear_allocator_tests.h" />
     <ClInclude Include="src\test_manager.h" />

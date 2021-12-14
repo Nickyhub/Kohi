@@ -81,7 +81,7 @@
     <ClCompile Include="src\math\kmath.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\renderer\vulkan\shaders\vulkan_object_shader.c">
+    <ClCompile Include="src\renderer\vulkan\shaders\vulkan_material_shader.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\renderer\vulkan\vulkan_shader_utils.c">
@@ -94,6 +94,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\renderer\vulkan\vulkan_buffer.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\containers\hashtable.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\systems\texture_system.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -182,7 +188,7 @@
     <ClInclude Include="src\math\kmath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\renderer\vulkan\shaders\vulkan_object_shader.h">
+    <ClInclude Include="src\renderer\vulkan\shaders\vulkan_material_shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\renderer\vulkan\vulkan_shader_utils.h">
@@ -201,6 +207,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\vendor\stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\containers\hashtable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\systems\texture_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

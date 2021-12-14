@@ -55,7 +55,7 @@ void test_manager_run_tests() {
 		char status[20];
 		string_format(status, failed ? "*** %d FAILED ***" : "SUCCESS", failed);
 		clock_update(&total_time);
-		EN_INFO("Executed %d of %d (skipped %d) %s (%.6f sec / %6.f sec total", i + 1, count, skipped, status, test_time.elapsed, total_time.elapsed);
+		EN_INFO("Executed %d of %d (skipped %d) %s (%.6f sec / %6.f sec total). Testname: %s", i + 1, count, skipped, status, test_time.elapsed, total_time.elapsed, tests[i].desc);
 	}
 	clock_stop(&total_time);
 	EN_INFO("Results: %d passed, %d failed, %d skipped.", passed, failed, skipped);

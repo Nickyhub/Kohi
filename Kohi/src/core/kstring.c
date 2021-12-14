@@ -5,6 +5,10 @@
 #include <stdarg.h>
 #include <string.h>
 
+#ifndef _MSC_VER
+#include <strings.h>
+#endif 
+
 u64 string_length(const char* str) {
 	return strlen(str);
 }
@@ -21,6 +25,14 @@ b8 strings_equal(const char* str0, const char* str1) {
 	return strcmp(str0, str1) == 0;
 }
 
+b8 strings_equali(const char* str0, const char* str1) {
+#ifdef __GNUC__
+	return strcasecmp(str0, str1) == 0; 
+#elif (defined _MSC_VER)
+	return _strcmpi(str0, str1) == 0;
+#endif
+}
+
 i32 string_format(char* dest, const char* format, ...) {
 	if (dest) {
 		va_list arg_ptr = 0;
@@ -35,9 +47,9 @@ i32 string_format(char* dest, const char* format, ...) {
 i32 string_format_v(char* dest, const char* format, void* va_list) {
 	if (dest) {
 		char buffer[16000];
-		i32 written = vsnprintf(buffer, 32000, format, va_list);
+		i32 written = vsnprintf(buffer, 16000, format, va_list);
 		buffer[written] = 0;
-		kcopy_memory(dest, buffer, written + 1);
+		kcopy_memory(dest, buffer, (u64)written + 1);
 		return written;
 	}
 	return -1;
