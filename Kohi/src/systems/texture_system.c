@@ -242,7 +242,6 @@ b8 create_default_textures(texture_system_state* state) {
 
 	renderer_create_texture(
 		"default",
-		false,
 		tex_dimension,
 		tex_dimension,
 		4,

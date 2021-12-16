@@ -317,7 +317,7 @@ void vulkan_material_shader_update_object(vulkan_context* context, struct vulkan
 	for (u32 sampler_index = 0; sampler_index < sampler_count; ++sampler_index) {
 		texture* t = data.textures[sampler_index];
 		u32* descriptor_generation = &object_state->descriptor_states[descriptor_index].generations[image_index];
-		u32* descripotr_id = &object_state->descriptor_states[descriptor_index].ids[image_index];
+		u32* descriptor_id = &object_state->descriptor_states[descriptor_index].ids[image_index];
 
 
 		//If the texture hasn't been loaded yet, use the default.
@@ -331,7 +331,7 @@ void vulkan_material_shader_update_object(vulkan_context* context, struct vulkan
 
 
 		// Check if the descriptor needs updating first.
-		if (t && (*descripotr_id != t->id || *descriptor_generation != t->generation || *descriptor_generation == INVALID_ID)) {
+		if (t && (*descriptor_id != t->id || *descriptor_generation != t->generation || *descriptor_generation == INVALID_ID)) {
 			vulkan_texture_data* internal_data = (vulkan_texture_data*)t->internal_data;
 
 			// Assign view and sampler.
@@ -352,7 +352,7 @@ void vulkan_material_shader_update_object(vulkan_context* context, struct vulkan
 			// Sync frame generation if not using a default texture.
 			if (t->generation != INVALID_ID) {
 				*descriptor_generation = t->generation;
-				*descripotr_id = t->id;
+				*descriptor_id = t->id;
 			}
 			descriptor_index++;
 		}

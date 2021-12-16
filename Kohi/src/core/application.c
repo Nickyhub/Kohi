@@ -125,7 +125,7 @@ b8 application_create(game* game_inst) {
 	texture_sys_config.max_texture_count = 65536;
 	texture_system_initalize(&app_state->texture_system_memory_requirement, 0, texture_sys_config);
 	app_state->texture_system_state = linear_allocator_allocate(&app_state->systems_allocator, app_state->texture_system_memory_requirement);
-	if (!texture_system_initalize(&app_state->texture_system_memory_requirement, &app_state->texture_system_state, texture_sys_config)) {
+	if (!texture_system_initalize(&app_state->texture_system_memory_requirement, app_state->texture_system_state, texture_sys_config)) {
 		EN_FATAL("Failed to initialize texture system. Application cannot continue.");
 		return false;
 	}

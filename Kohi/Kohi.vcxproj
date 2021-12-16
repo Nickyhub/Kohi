@@ -61,7 +61,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>src;D:\Dev\Projekte\_Libraries\Vulkan\1.2.182.0\Include;C:\VulkanSDK\1.2.182.0\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;C:\VulkanSDK\1.2.182.0\Include;%(AdditionalIncludeDirectories);$(ProjectDir);$(ProjectDir)vendor\1.2.182.0\Include;$(ProjectDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -85,7 +85,7 @@ PAUSE</Command>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>src;D:\Dev\Projekte\_Libraries\Vulkan\1.2.182.0\Include;$(SolutionDir)vendor\Vulkan1.2.176.1\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;$(SolutionDir)vendor\Vulkan1.2.176.1\Include;%(AdditionalIncludeDirectories);$(ProjectDir);$(ProjectDir)vendor\1.2.182.0\Include;$(ProjectDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
