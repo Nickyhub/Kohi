@@ -3,6 +3,7 @@
 #include "platform/platform.h"
 #include <string.h>
 #include <stdio.h>
+#include "memory/dynamic_allocator.h"
 
 struct memory_stats {
 	u64 total_allocated;
@@ -32,25 +33,60 @@ static const char* memory_tag_strings[MEMORY_TAG_MAX_TAGS] = {
 static struct memory_stats stats;
 
 typedef struct memory_system_state {
+	memory_system_configuration config;
 	struct memory_stats stats;
 	u64 alloc_count;
+	u64 allocator_memory_requirement;
+	dynamic_allocator allocator;
+	void* allocator_block;
 }memory_system_state;
 
 static memory_system_state* state_ptr;
 
-void memory_system_initialize(u64* memory_requirement, void* state) {
-	*memory_requirement = sizeof(memory_system_state);
-	if (state == 0) {
-		return;
+b8 memory_system_initialize(memory_system_configuration config) {
+	// The amount neede by the system state.
+	u64 state_memory_requirement = sizeof(memory_system_state);
+	
+	// Figure out how much space the dynamic allocator needs.
+	u64 alloc_requirement = 0;
+	dynamic_allocator_create(config.total_alloc_size, &alloc_requirement, 0, 0);
+
+	// Call the platform allocator to get the memory for the whole system, including the state.
+
+	void* block = platform_allocate(state_memory_requirement + alloc_requirement, false);
+	if (!block) {
+		EN_FATAL("Memory system allocation failed and the system cannot continue.");
+		return false;
 	}
 
-	state_ptr = state;
+	// the sat4e is in the first part of the massive block of memory.
+	state_ptr = (memory_system_state*)block;
+	state_ptr->config = config;
 	state_ptr->alloc_count = 0;
-
+	state_ptr->allocator_memory_requirement = alloc_requirement;
 	platform_zero_memory(&state_ptr->stats, sizeof(state_ptr->stats));
+	// The allocator block is in the same block of memory, but after the state.
+	state_ptr->allocator_block = ((void*)((u8*)block + state_memory_requirement));
+
+	if (!dynamic_allocator_create(
+		config.total_alloc_size,
+		&state_ptr->allocator_memory_requirement,
+		state_ptr->allocator_block,
+		&state_ptr->allocator)) {
+		EN_FATAL("Memory system is unable to setup internal allocator. Application cannot continue.");
+		return false;
+	}
+
+	EN_DEBUG("Memory system successfully allocated %llu bytes.", config.total_alloc_size);
+	return true;
 }
 
-void memory_system_shutdown(void* state) {
+void memory_system_shutdown() {
+	if (state_ptr) {
+		dynamic_allocator_destroy(&state_ptr->allocator);
+		// free the entire block.
+		platform_free(state_ptr, state_ptr->allocator_memory_requirement + sizeof(memory_system_state));
+	}
 	state_ptr = 0;
 }
 
@@ -59,26 +95,54 @@ void* kallocate(u64 size, memory_tag tag) {
 		EN_WARN("kallocate called using MEMORY_TAG_UNKNOWN. Re-class this allocation");
 	}
 
+	// Either allocate from the systems's allocator or the OS. The latter shouldn't ever
+	// really happen.
+	void* block = 0;
+
 	if (state_ptr) {
 		state_ptr->stats.total_allocated += size;
 		state_ptr->stats.tagged_allocations[tag] += size;
 		state_ptr->alloc_count++;
+
+		block = dynamic_allocator_allocate(&state_ptr->allocator, size);
+	}
+	else {
+		// If the system is not up yet, warn about it but give memory for now.
+		EN_WARN("kallocate called before the memory system is initialized.");
+		block = platform_allocate(size, false);
 	}
 
-	void* block = platform_allocate(size, false);
-	platform_zero_memory(block, size);
-	return block;
+
+	if (block) {
+		platform_zero_memory(block, size);
+		return block;
+	}
+
+	EN_FATAL("kallocate failed to allocate successfully.");
+	return 0;
 }
 
 void kfree(void* block, u64 size, memory_tag tag) {
 	if (tag == MEMORY_TAG_UNKNOWN) {
 		EN_WARN("kfree called using MEMORY_TAG_UNKNOWN. Re-class this free");
 	}
+
 	if (state_ptr) {
 		state_ptr->stats.total_allocated -= size;
 		state_ptr->stats.tagged_allocations[tag] -= size;
+		b8 result = dynamic_allocator_free(&state_ptr->allocator, block, size);
+
+		// If the free failed, it's possible this is because the allocation was amde
+		// before this system was started up. Since this absolutely should be an exception
+		// to the rule, try freeing it on the platform level. If this fails, some other
+		// brand of skulduggery is afoot, and we have bigger problems on our hands.
+		if (!result) {
+			platform_free(block, false);
+		}
 	}
-	platform_free(block, false);
+	else {
+		platform_free(block, false);
+	}
 }
 
 void* kzero_memory(void* block, u64 size) {

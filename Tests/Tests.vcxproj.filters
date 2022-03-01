@@ -27,6 +27,12 @@
     <ClCompile Include="src\containers\hashtable_tests.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\containers\freelist_tests.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\memory\dynamic_allocator_tests.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\expect.h">
@@ -39,6 +45,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\containers\hashtable_tests.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\containers\freelist_tests.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\memory\dynamic_allocator_tests.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

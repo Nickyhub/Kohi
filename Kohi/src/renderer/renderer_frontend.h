@@ -14,13 +14,12 @@ b8 renderer_draw_frame(render_packet* packet);
 //This should not be exposed outside the engine
 KAPI void renderer_set_view(mat4 view);
 
-void renderer_create_texture(
-	const char* name,
-	i32 width,
-	i32 height,
-	i32 channel_count,
-	const u8* pixels,
-	b8 has_transparency,
-	struct texture* out_texture);
-
+void renderer_create_texture(const u8* pixels, struct texture* texture);
 void renderer_destroy_texture(struct texture* texture);
+
+b8 renderer_create_material(struct material* material);
+void renderer_destroy_material(struct materal* material);
+
+b8 renderer_create_geometry(geometry* geometry, u32 vertex_size, u32 vertex_count, const void* vertices, u32 index_size, u32 index_count, const u32* indices);
+void renderer_destroy_geometry(geometry* geometry);
+

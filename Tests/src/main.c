@@ -9,6 +9,7 @@ int main() {
 
 	linear_allocator_register_tests();
 	hashtable_register_tests();
+	freelist_register_tests();
 	//TODO Register tests
 
 

@@ -61,6 +61,7 @@ void vulkan_swapchain_present(
 	VkResult result = vkQueuePresentKHR(present_queue, &present_info);
 	if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
 		vulkan_swapchain_recreate(context, context->framebuffer_width, context->framebuffer_height, swapchain->handle);
+		EN_DEBUG("Swapchain recreated because swapchain returned out of date or suboptimal.");
 	}
 	else if (result != VK_SUCCESS) {
 		EN_FATAL("Failed to acquire swapchain image!");
@@ -72,7 +73,7 @@ void vulkan_swapchain_present(
 
 void create(vulkan_context* context, u32 width, u32 height, vulkan_swapchain* swapchain) {
 	VkExtent2D swapchain_extent = { width, height };
-	
+
 
 	b8 found = false;
 	for (u32 i = 0; i < context->device.swapchain_support.format_count; ++i) {

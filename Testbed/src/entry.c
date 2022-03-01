@@ -12,7 +12,8 @@ b8 create_game(game* out_game) {
 	out_game->initialize = game_initialize;
 	out_game->on_resize = game_on_resize;
 
-	out_game->state = kallocate(sizeof(game_state), false);
+	out_game->state_memory_requirement = sizeof(game_state);
 	out_game->application_state = 0;
+	out_game->state = 0;
 	return true;
 }

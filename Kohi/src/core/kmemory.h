@@ -2,6 +2,10 @@
 
 #include "defines.h"
 
+typedef struct memory_system_configuration {
+	u64 total_alloc_size;
+} memory_system_configuration;
+
 typedef enum memory_tag {
 	MEMORY_TAG_UNKNOWN,
 	MEMORY_TAG_ARRAY,
@@ -24,8 +28,8 @@ typedef enum memory_tag {
 	MEMORY_TAG_MAX_TAGS
 }memory_tag;
 
-KAPI void memory_system_initialize(u64* memory_requirement, void* state);
-KAPI void memory_system_shutdown(void* state);
+KAPI b8 memory_system_initialize(memory_system_configuration config);
+KAPI void memory_system_shutdown();
 
 KAPI void* kallocate(u64 size, memory_tag tag);
 KAPI void kfree(void* block, u64 size, memory_tag tag);
