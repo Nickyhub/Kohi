@@ -2,6 +2,6 @@
 
 version=0.1
 name=test_ui_material
-diffuse_colour= 1.0 1.0 1.0 1.0
-diffuse_map_name=dev_orange
-type=ui
+diffuse_colour=1.0 1.0 1.0 1.0
+diffuse_map_name=kohi
+shader=Shader.Builtin.UI

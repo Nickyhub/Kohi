@@ -1,26 +1,32 @@
 @echo off
 
-
-echo "Current Directory " %cd%
-
 echo "Compiling shaders..."
-echo "Kohi/assets/shaders/Builtin.MaterialShader.vert.glsl -> assets/shaders/Builtin.MaterialShader.vert.spv"
-%VULKAN_SDK%\bin\glslc.exe -fshader-stage=vert Kohi/assets/shaders/Builtin.MaterialShader.vert.glsl -o Kohi/assets/shaders/Builtin.MaterialShader.vert.spv
+
+PUSHD bin
+bin\x64\Debug\tools.exe buildshaders ^
+..\Kohi\assets\shaders\Builtin.MaterialShader.vert.glsl ^
+..\Kohi\assets\shaders\Builtin.MaterialShader.frag.glsl ^
+..\Kohi\assets\shaders\Builtin.UIShader.vert.glsl ^
+..\Kohi\assets\shaders\Builtin.UIShader.frag.glsl ^
+..\Kohi\assets\shaders\Builtin.SkyboxShader.vert.glsl ^
+..\Kohi\assets\shaders\Builtin.SkyboxShader.frag.glsl ^
+IF %ERRORLEVEL% NEQ 0 (echo Error:%ERRORLEVEL% && exit)
+
+POPD
+
+
+echo "assets/shaders/Builtin.SkyboxShader.vert.glsl -> assets/shaders/Builtin.SkyboxShader.vert.spv"
+%VULKAN_SDK%\bin\glslc.exe -fshader-stage=vert Kohi/assets/shaders/Builtin.SkyboxShader.vert.glsl -o Kohi/assets/shaders/Builtin.SkyboxShader.vert.spv
 IF %ERRORLEVEL% NEQ 0 (echo Error: %ERRORLEVEL% && exit)
 
-echo "Kohi/assets/shaders/Builtin.MaterialShader.frag.glsl -> assets/shaders/Builtin.MaterialShader.frag.spv"
-%VULKAN_SDK%\bin\glslc.exe -fshader-stage=frag Kohi/assets/shaders/Builtin.MaterialShader.frag.glsl -o Kohi/assets/shaders/Builtin.MaterialShader.frag.spv
+echo "assets/shaders/Builtin.SkyboxShader.frag.glsl -> assets/shaders/Builtin.SkyboxShader.frag.spv"
+%VULKAN_SDK%\bin\glslc.exe -fshader-stage=frag Kohi/assets/shaders/Builtin.SkyboxShader.frag.glsl -o Kohi/assets/shaders/Builtin.SkyboxShader.frag.spv
 IF %ERRORLEVEL% NEQ 0 (echo Error: %ERRORLEVEL% && exit)
-
-echo "Kohi/assets/shaders/Builtin.UIShader.vert.glsl -> assets/shaders/Builtin.UIShader.vert.spv"
-%VULKAN_SDK%\bin\glslc.exe -fshader-stage=vert Kohi/assets/shaders/Builtin.UIShader.vert.glsl -o Kohi/assets/shaders/Builtin.UIShader.vert.spv
-IF %ERRORLEVEL% NEQ 0 (echo Error: %ERRORLEVEL% && exit)
-
-echo "Kohi/assets/shaders/Builtin.UIShader.frag.glsl -> assets/shaders/Builtin.UIShader.frag.spv"
-%VULKAN_SDK%\bin\glslc.exe -fshader-stage=frag Kohi/assets/shaders/Builtin.UIShader.frag.glsl -o Kohi/assets/shaders/Builtin.UIShader.frag.spv
-IF %ERRORLEVEL% NEQ 0 (echo Error: %ERRORLEVEL% && exit)
-
 
 xcopy "Kohi/assets" "bin\bin\x64\Debug\assets" /h /i /c /k /e /r /y
+IF %ERRORLEVEL% NEQ 0 (echo Error: %ERRORLEVEL% && exit)
 echo "Done."
-pause
+
+
+echo "Done."
+PAUSE

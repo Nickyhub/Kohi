@@ -173,7 +173,7 @@ u8 dynamic_allocator_multi_allocation_over_allocate() {
 	expect_should_be(0, free_space);
 
 	// Attempt one more allocation, deliberately trying to overflow
-	EN_DEBUG("Note: The following warning and errors are intentionally caused by this test.");
+	KDEBUG("Note: The following warning and errors are intentionally caused by this test.");
 	void* fail_block = dynamic_allocator_allocate(&alloc, 256);
 	expect_should_be(0, fail_block);
 
@@ -229,7 +229,7 @@ u8 dynamic_allocator_multi_allocation_most_space_request_too_big() {
 	expect_should_be(128, free_space);
 
 	// Attempt one more allocation, deliberately trying to overflow
-	EN_DEBUG("Note: The following warning and errors are intentionally caused by this test.");
+	KDEBUG("Note: The following warning and errors are intentionally caused by this test.");
 	void* fail_block = dynamic_allocator_allocate(&alloc, 256);
 	expect_should_be(0, fail_block);
 

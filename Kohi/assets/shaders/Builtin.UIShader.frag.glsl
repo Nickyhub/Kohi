@@ -1,19 +1,22 @@
 #version 450
 
+#extension GL_KHR_vulkan_glsl : enable
+
 layout(location = 0) out vec4 out_colour;
 
-layout(set = 1, binding = 0) uniform local_uniform_object{
-	vec4 diffuse_colour;
-}object_ubo;
+layout(set = 1, binding = 0) uniform local_uniform_object {
+    vec4 diffuse_colour;
+} object_ubo;
 
-//Samplers
-layout(set = 1, binding = 1) uniform sampler2D diffuse_sampler;
+// Samplers
+const int SAMP_DIFFUSE = 0;
+layout(set = 1, binding = 1) uniform sampler2D samplers[1];
 
-//Data Transfer object
+// Data Transfer Object
 layout(location = 1) in struct dto {
 	vec2 tex_coord;
 } in_dto;
 
 void main() {
-	out_colour = object_ubo.diffuse_colour * texture(diffuse_sampler, in_dto.tex_coord);
+    out_colour =  object_ubo.diffuse_colour * texture(samplers[SAMP_DIFFUSE], in_dto.tex_coord);
 }

@@ -1,15 +1,13 @@
 #pragma once
 
 #include <defines.h>
-#include <gametypes.h>
 #include <math/kmath.h>
+#include <game_types.h>
+#include <systems/camera_system.h>
 
 typedef struct game_state {
 	f32 delta_time;
-	mat4 view;
-	vec3 camera_position;
-	vec3 camera_euler;
-	b8 camera_view_dirty;
+	camera* world_camera;
 }game_state;
 
 b8 game_initialize(game* game_inst);

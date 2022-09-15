@@ -13,7 +13,7 @@ int main() {
 	//TODO Register tests
 
 
-	EN_DEBUG("Starting tests...");
+	KDEBUG("Starting tests...");
 
 	test_manager_run_tests(0);
 	return 0;
