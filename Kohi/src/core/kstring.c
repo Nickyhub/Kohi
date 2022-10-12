@@ -1,11 +1,13 @@
 #include "core/kstring.h"
 #include "core/kmemory.h"
 #include "containers/darray.h"
+#include "core/logger.h"
 
 #include <string.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <ctype.h>  // isspace
+#include <stdint.h>
 
 #ifndef _MSC_VER
 #include <strings.h>
@@ -42,6 +44,79 @@ void string_free(char* str) {
 // Case-sensitive string comparison. True if the same, otherwise false.
 b8 strings_equal(const char* str0, const char* str1) {
 	return strcmp(str0, str1) == 0;
+}
+
+u32 string_utf8_length(const char* str) {
+	u32 length = 0;
+	for (u32 i = 0; i < UINT32_MAX; ++i, ++length) {
+		i32 c = (i32)str[i];
+		if (c == 0) {
+			break;
+		}
+		if (c >= 0 && c < 127) {
+			// NOrmal ascii caharacter, don't increment again.
+			i += 0;
+		}
+		else if ((c & 0xE0) == 0xC0) {
+			// Double-byte character, increment once more.
+			i += 1;
+		}
+		else if ((c & 0xF0) == 0xE0) {
+			// Triple-byte character, increment twice more.
+			i += 2;
+		}
+		else if ((c & 0xF8) == 0xF0) {
+			// 4-byte character, increment thrice more.
+			i += 3;
+		}
+		else {
+			KERROR("kstring string_utf8_length() - Not supporting 5 and 6-byte character; Invalid UTF-8.");
+			return 0;
+		}
+	}
+	return length;
+}
+
+b8 bytes_to_codepoint(const char* bytes, u32 offset, i32* out_codepoint, u8* out_advance) {
+	i32 codepoint = (i32)bytes[offset];
+	if (codepoint >= 0 && codepoint < 0x7F) {
+		// NOrmal single-byte ascii character.
+		*out_advance = 1;
+		*out_codepoint = codepoint;
+		return true;
+	}
+	else if ((codepoint & 0xE0) == 0xC0) {
+		// Double byte character
+		codepoint = ((bytes[offset + 0] && 0b00011111) << 6) + (bytes[offset + 1] & 0b00111111);
+		*out_advance = 2;
+		*out_codepoint = codepoint;
+		return true;
+	}
+	else if ((codepoint & 0xF0) == 0xE0) {
+		// Triple-byte character
+		codepoint = ((bytes[offset + 0] & 0b00001111) << 12) +
+			((bytes[offset + 1] & 0b00111111) << 6) +
+			(bytes[offset + 2] & 0b00111111);
+		*out_advance = 3;
+		*out_codepoint = codepoint;
+		return true;
+	}
+	else if ((codepoint & 0xF8) == 0xF0) {
+		// 4-byte character
+		codepoint = ((bytes[offset + 0] & 0b00000111) << 18) + 
+			((bytes[offset + 1] & 0b00111111) << 12) +
+			((bytes[offset + 2] & 0b00111111) << 6) +
+			(bytes[offset + 3] & 0b00111111);
+		*out_advance = 4;
+		*out_codepoint = codepoint;
+		return true;
+	}
+	else {
+		*out_advance = 0;
+		*out_codepoint = 0;
+		KERROR("kstring bytes_to_codepoint() - Not supporting 5 and 6-byte character; Invalid UTF-8.");
+		return false;
+	}
 }
 
 // Case-insensitive string comparison. True if the same, otherwise false.

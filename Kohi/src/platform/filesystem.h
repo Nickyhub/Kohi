@@ -30,6 +30,13 @@ typedef enum file_modes {
     FILE_MODE_WRITE = 0x2
 } file_modes;
 
+#define CLOSE_IF_FAILED(func, handle)       \
+    if (!func) {                            \
+        KERROR("File operation failed.");   \
+        filesystem_close(handle);           \
+        return false;                       \
+    }
+
 /**
  * @brief Checks if a file with the given path exists.
  * @param path The path of the file to be checked.

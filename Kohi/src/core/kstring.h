@@ -21,6 +21,10 @@
  */
 KAPI u64 string_length(const char* str);
 
+KAPI u32 string_utf8_length(const char* str);
+
+KAPI b8 bytes_to_codepoint(const char* bytes, u32 offset, i32* out_codepoint, u8* out_advance);
+
 /**
  * @brief Duplicates the provided string. Note that this allocates new memory,
  * which should be freed by the caller.

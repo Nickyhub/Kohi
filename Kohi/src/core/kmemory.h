@@ -125,6 +125,9 @@ KAPI void* kset_memory(void* dest, i32 value, u64 size);
  */
 KAPI char* get_memory_usage_str();
 
+KAPI const char* get_unit_for_size(u64 size_bytes, f32* out_amount);
+
+
 /**
  * @brief Obtains the number of times kallocate was called since the memory system was initialized.
  * @returns The total count of allocations since the system's initialization.

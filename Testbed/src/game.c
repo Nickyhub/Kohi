@@ -24,9 +24,9 @@ b8 game_update(game* game_inst, f32 delta_time) {
 
 	if (input_is_key_up('M') && input_was_key_down('M')) {
 		char* usage = get_memory_usage_str();
-		KINFO("usage");
+		KINFO(usage);
 		string_free(usage);
-		KDEBUG("Allocations: %llu (%llu this frame", alloc_count, alloc_count - prev_alloc_count);
+		KDEBUG("Allocations: %llu (%llu this frame)", alloc_count, alloc_count - prev_alloc_count);
 	}
 
 	if (input_is_key_up('T') && input_was_key_down('T')) {

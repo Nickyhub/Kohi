@@ -81,9 +81,6 @@
     <ClCompile Include="src\renderer\vulkan\vulkan_pipeline.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\renderer\vulkan\vulkan_buffer.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\containers\hashtable.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -163,6 +160,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\resources\mesh.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resources\loaders\bitmap_font_loader.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\systems\font_system.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resources\ui_text.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -249,9 +255,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\renderer\vulkan\vulkan_pipeline.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\renderer\vulkan\vulkan_buffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\resources\resource_types.h">
@@ -345,6 +348,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\resources\mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resources\loaders\bitmap_font_loader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\systems\font_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resources\ui_text.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
