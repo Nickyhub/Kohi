@@ -147,10 +147,10 @@ KAPI void* _darray_insert_at(void* array, u64 index, void* value_ptr);
  * @param value The value to be pushed. A copy of this value is taken.
  * @returns A pointer to the array block.
  */
-#define darray_push(array, value)        \
-{                                        \
-	array = _darray_push(array, &value); \
-}
+#define darray_push(array, value)           \
+    {                                       \
+        array = _darray_push(array, &value); \
+    }
 // NOTE: could use __auto_type for temp above, but intellisense
 // for VSCode flags it as an unknown type. typeof() seems to
 // work just fine, though. Both are GNU extensions.

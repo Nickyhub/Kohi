@@ -306,8 +306,9 @@ b8 select_physical_device(vulkan_context* context) {
     requirements.discrete_gpu = true;
 #endif
     requirements.device_extension_names = darray_create(const char*);
-    const char** requirement = &VK_KHR_SWAPCHAIN_EXTENSION_NAME;
-    darray_push(requirements.device_extension_names, requirement);
+
+    const char** required_extension_name = &VK_KHR_SWAPCHAIN_EXTENSION_NAME;
+    darray_push(requirements.device_extension_names, required_extension_name);
 
     // Iterate physical devices to find one that fits the bill.
     VkPhysicalDevice physical_devices[32];
@@ -334,7 +335,7 @@ b8 select_physical_device(vulkan_context* context) {
                 supports_device_local_host_visible = true;
                 break;
             }
-        }
+        }                                                      
 
         vulkan_physical_device_queue_family_info queue_info = {0};
         b8 result = physical_device_meets_requirements(

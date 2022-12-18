@@ -29,23 +29,33 @@ typedef enum resource_type {
     RESOURCE_TYPE_MESH,
     /** @brief Bitmap font resource type. */
     RESOURCE_TYPE_BITMAP_FONT,
+    /** @brief System font resource type. */
+    RESOURCE_TYPE_SYSTEM_FONT,
     /** @brief Custom resource type. Used by loaders outside the core engine. */
-    RESOURCE_TYPE_CUSTOM,
+    RESOURCE_TYPE_CUSTOM
 } resource_type;
 
+/** @brief A magic number indicating the file as a kohi binary file. */
 #define RESOURCE_MAGIC 0xcafebabe
+
+/**
+ * @brief The header data for binary resource types.
+ */
+typedef struct resource_header {
+    /** @brief A magic number indicating the file as a kohi binary file. */
+    u32 magic_number;
+    /** @brief The resource type. Maps to the enum resource_type. */
+    u8 resource_type;
+    /** @brief The format version this resource uses. */
+    u8 version;
+    /** @brief Reserved for future header data.. */
+    u16 reserved;
+} resource_header;
+
 /**
  * @brief A generic structure for a resource. All resource loaders
  * load data into these.
  */
-
-typedef struct resource_header {
-    u32 magic_number;
-    u8 resource_type;
-    u8 version;
-    u16 reserved;
-} resource_header;
-
 typedef struct resource {
     /** @brief The identifier of the loader which handles this resource. */
     u32 loader_id;
@@ -103,6 +113,8 @@ typedef enum texture_flag {
     TEXTURE_FLAG_IS_WRITEABLE = 0x2,
     /** @brief Indicates if the texture was created via wrapping vs traditional creation. */
     TEXTURE_FLAG_IS_WRAPPED = 0x4,
+    /** @brief Indicates the texture is a depth texture. */
+    TEXTURE_FLAG_DEPTH = 0x8
 } texture_flag;
 
 /** @brief Holds bit flags for textures.. */
@@ -214,7 +226,7 @@ typedef struct font_kerning {
 
 typedef enum font_type {
     FONT_TYPE_BITMAP,
-    FONT_TYPE_SYSTEM,
+    FONT_TYPE_SYSTEM
 } font_type;
 
 typedef struct font_data {
@@ -245,6 +257,17 @@ typedef struct bitmap_font_resource_data {
     u32 page_count;
     bitmap_font_page* pages;
 } bitmap_font_resource_data;
+
+typedef struct system_font_face {
+    char name[256];
+} system_font_face;
+
+typedef struct system_font_resource_data {
+    // darray
+    system_font_face* fonts;
+    u64 binary_size;
+    void* font_binary;
+} system_font_resource_data;
 
 /** @brief The maximum length of a material name. */
 #define MATERIAL_NAME_MAX_LENGTH 256
@@ -329,19 +352,12 @@ typedef struct geometry {
 } geometry;
 
 typedef struct mesh {
+    u32 unique_id;
     u8 generation;
     u16 geometry_count;
     geometry** geometries;
     transform transform;
 } mesh;
-
-typedef struct skybox {
-    texture_map cubemap;
-    geometry* g;
-    u32 instance_id;
-    /** @brief Synced to the renderer's current frame number when the material has been applied that frame. */
-    u64 render_frame_number;
-} skybox;
 
 /** @brief Shader stages available in the system. */
 typedef enum shader_stage {
@@ -446,9 +462,6 @@ typedef struct shader_config {
     /** @brief The collection of uniforms. Darray. */
     shader_uniform_config* uniforms;
 
-    /** @brief The name of the renderpass used by this shader. */
-    char* renderpass_name;
-
     /** @brief The number of stages present in the shader. */
     u8 stage_count;
     /** @brief The collection of stages. Darray. */
@@ -457,4 +470,13 @@ typedef struct shader_config {
     char** stage_names;
     /** @brief The collection of stage file names to be loaded (one per stage). Must align with stages array. Darray. */
     char** stage_filenames;
+
+    // TODO: Convert these bools to flags.
+    /** @brief Indicates if depth testing should be done. */
+    b8 depth_test;
+    /**
+     * @brief Indicates if the results of depth testing should be written to the depth buffer.
+     * NOTE: This is ignored if depth_test is false.
+     */
+    b8 depth_write;
 } shader_config;

@@ -8,9 +8,9 @@
  * allocations directly will use allocators as they are added to the system.
  * @version 1.0
  * @date 2022-01-10
- * 
+ *
  * @copyright Kohi Game Engine is Copyright (c) Travis Vroman 2021-2022
- * 
+ *
  */
 
 #pragma once
@@ -40,12 +40,16 @@ typedef enum memory_tag {
     MEMORY_TAG_SCENE,
     MEMORY_TAG_RESOURCE,
     MEMORY_TAG_VULKAN,
+    // "External" vulkan allocations, for reporting purposes only.
     MEMORY_TAG_VULKAN_EXT,
     MEMORY_TAG_DIRECT3D,
     MEMORY_TAG_OPENGL,
+    // Representation of GPU-local/vram
     MEMORY_TAG_GPU_LOCAL,
+    MEMORY_TAG_BITMAP_FONT,
+    MEMORY_TAG_SYSTEM_FONT,
 
-    MEMORY_TAG_MAX_TAGS,
+    MEMORY_TAG_MAX_TAGS
 } memory_tag;
 
 /** @brief The configuration for the memory system. */
@@ -74,9 +78,27 @@ KAPI void memory_system_shutdown();
  */
 KAPI void* kallocate(u64 size, memory_tag tag);
 
+/**
+ * @brief Performs an aligned memory allocation from the host of the given size and alignment.
+ * The allocation is tracked for the provided tag. NOTE: Memory allocated this way must be freed
+ * using kfree_aligned.
+ * @param size The size of the allocation.
+ * @param alignment The alignment in bytes.
+ * @param tag Indicates the use of the allocated block.
+ * @returns If successful, a pointer to a block of allocated memory; otherwise 0.
+ */
 KAPI void* kallocate_aligned(u64 size, u16 alignment, memory_tag tag);
 
-KAPI  void kallocate_report(u64 size, memory_tag tag);
+/**
+ * @brief Reports an allocation associated with the application, but made externally.
+ * This can be done for items allocated within 3rd party libraries, for example, to
+ * track allocations but not perform them.
+ *
+ * @param size The size of the allocation.
+ * @param tag Indicates the use of the allocated block.
+ */
+KAPI void kallocate_report(u64 size, memory_tag tag);
+
 /**
  * @brief Frees the given block, and untracks its size from the given tag.
  * @param block A pointer to the block of memory to be freed.
@@ -85,11 +107,34 @@ KAPI  void kallocate_report(u64 size, memory_tag tag);
  */
 KAPI void kfree(void* block, u64 size, memory_tag tag);
 
+/**
+ * @brief Frees the given block, and untracks its size from the given tag.
+ * @param block A pointer to the block of memory to be freed.
+ * @param size The size of the block to be freed.
+ * @param tag The tag indicating the block's use.
+ */
 KAPI void kfree_aligned(void* block, u64 size, u16 alignment, memory_tag tag);
 
+/**
+ * @brief Reports a free associated with the application, but made externally.
+ * This can be done for items allocated within 3rd party libraries, for example, to
+ * track frees but not perform them.
+ *
+ * @param size The size in bytes.
+ * @param tag The tag indicating the block's use.
+ */
 KAPI void kfree_report(u64 size, memory_tag tag);
 
-KAPI b8 kmemory_get_size_aligment(void* block, u64* out_size, u16* out_alignment);
+/**
+ * @brief Returns the size and alignment of the given block of memory.
+ * NOTE: A failure result from this method most likely indicates heap corruption.
+ *
+ * @param block The memory block.
+ * @param out_size A pointer to hold the size of the block.
+ * @param out_alignment A pointer to hold the alignment of the block.
+ * @return True on success; otherwise false.
+ */
+KAPI b8 kmemory_get_size_alignment(void* block, u64* out_size, u16* out_alignment);
 
 /**
  * @brief Zeroes out the provided memory block.
@@ -124,9 +169,6 @@ KAPI void* kset_memory(void* dest, i32 value, u64 size);
  * @returns A pointer to a character array containing the string representation of memory usage.
  */
 KAPI char* get_memory_usage_str();
-
-KAPI const char* get_unit_for_size(u64 size_bytes, f32* out_amount);
-
 
 /**
  * @brief Obtains the number of times kallocate was called since the memory system was initialized.

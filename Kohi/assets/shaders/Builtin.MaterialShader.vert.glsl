@@ -6,6 +6,7 @@ layout(location = 2) in vec2 in_texcoord;
 layout(location = 3) in vec4 in_colour;
 layout(location = 4) in vec3 in_tangent;
 
+
 layout(set = 0, binding = 0) uniform global_uniform_object {
     mat4 projection;
 	mat4 view;
@@ -41,7 +42,7 @@ void main() {
 	// Copy the normal over.
 	mat3 m3_model = mat3(u_push_constants.model);
 	out_dto.normal = normalize(m3_model * in_normal);
-	out_dto.tangent = normalize(m3_model * in_tangent);//, in_tangent.w);
+	out_dto.tangent = normalize(m3_model * in_tangent);
 	out_dto.ambient = global_ubo.ambient_colour;
 	out_dto.view_position = global_ubo.view_position;
     gl_Position = global_ubo.projection * global_ubo.view * u_push_constants.model * vec4(in_position, 1.0);

@@ -1,7 +1,5 @@
 #version 450
 
-#extension GL_KHR_vulkan_glsl : enable
-
 layout(location = 0) in vec3 tex_coord;
 
 layout(location = 0) out vec4 out_colour;
@@ -11,5 +9,5 @@ const int SAMP_DIFFUSE = 0;
 layout(set = 1, binding = 0) uniform samplerCube samplers[1];
 
 void main() {
-	out_colour = texture(samplers[SAMP_DIFFUSE], tex_coord);
-}
+    out_colour = texture(samplers[SAMP_DIFFUSE], tex_coord);
+} 

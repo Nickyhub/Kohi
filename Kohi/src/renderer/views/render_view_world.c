@@ -5,14 +5,17 @@
 #include "core/event.h"
 #include "math/kmath.h"
 #include "math/transform.h"
+#include "memory/linear_allocator.h"
 #include "containers/darray.h"
+#include "systems/resource_system.h"
 #include "systems/material_system.h"
+#include "systems/render_view_system.h"
 #include "systems/shader_system.h"
 #include "systems/camera_system.h"
 #include "renderer/renderer_frontend.h"
 
 typedef struct render_view_world_internal_data {
-    u32 shader_id;
+    shader* s;
     f32 fov;
     f32 near_clip;
     f32 far_clip;
@@ -70,6 +73,10 @@ static b8 render_view_on_event(u16 code, void* sender, void* listener_inst, even
             }
             return true;
         }
+        case EVENT_CODE_DEFAULT_RENDERTARGET_REFRESH_REQUIRED:
+            render_view_system_regenerate_render_targets(self);
+            // This needs to be consumed by other views, so consider it _not_ handled.
+            return false;
     }
 
     // Event purposely not handled to allow other listeners to get this.
@@ -80,8 +87,25 @@ b8 render_view_world_on_create(struct render_view* self) {
     if (self) {
         self->internal_data = kallocate(sizeof(render_view_world_internal_data), MEMORY_TAG_RENDERER);
         render_view_world_internal_data* data = self->internal_data;
+
+        // TODO: move to material system and get a reference here instead.
+        // Builtin material shader.
+        const char* shader_name = "Shader.Builtin.Material";
+        resource config_resource;
+        if (!resource_system_load(shader_name, RESOURCE_TYPE_SHADER, 0, &config_resource)) {
+            KERROR("Failed to load builtin material shader.");
+            return false;
+        }
+        shader_config* config = (shader_config*)config_resource.data;
+        // NOTE: Assuming the first pass since that's all this view has.
+        if (!shader_system_create(&self->passes[0], config)) {
+            KERROR("Failed to load builtin material shader.");
+            return false;
+        }
+        resource_system_unload(&config_resource);
+
         // Get either the custom shader override or the defined default.
-        data->shader_id = shader_system_get_id(self->custom_shader_name ? self->custom_shader_name : "Shader.Builtin.Material");
+        data->s = shader_system_get(self->custom_shader_name ? self->custom_shader_name : shader_name);
         // TODO: Set from configuration.
         data->near_clip = 0.1f;
         data->far_clip = 1000.0f;
@@ -100,6 +124,11 @@ b8 render_view_world_on_create(struct render_view* self) {
             KERROR("Unable to listen for render mode set event, creation failed.");
             return false;
         }
+
+        if (!event_register(EVENT_CODE_DEFAULT_RENDERTARGET_REFRESH_REQUIRED, self, render_view_on_event)) {
+            KERROR("Unable to listen for refresh required event, creation failed.");
+            return false;
+        }
         return true;
     }
 
@@ -110,6 +139,10 @@ b8 render_view_world_on_create(struct render_view* self) {
 void render_view_world_on_destroy(struct render_view* self) {
     if (self && self->internal_data) {
         event_unregister(EVENT_CODE_SET_RENDER_MODE, self, render_view_on_event);
+
+        // Unregister from the event.
+        event_unregister(EVENT_CODE_DEFAULT_RENDERTARGET_REFRESH_REQUIRED, self, render_view_on_event);
+
         kfree(self->internal_data, sizeof(render_view_world_internal_data), MEMORY_TAG_RENDERER);
         self->internal_data = 0;
     }
@@ -126,21 +159,21 @@ void render_view_world_on_resize(struct render_view* self, u32 width, u32 height
         data->projection_matrix = mat4_perspective(data->fov, aspect, data->near_clip, data->far_clip);
 
         for (u32 i = 0; i < self->renderpass_count; ++i) {
-            self->passes[i]->render_area.x = 0;
-            self->passes[i]->render_area.y = 0;
-            self->passes[i]->render_area.z = width;
-            self->passes[i]->render_area.w = height;
+            self->passes[i].render_area.x = 0;
+            self->passes[i].render_area.y = 0;
+            self->passes[i].render_area.z = width;
+            self->passes[i].render_area.w = height;
         }
     }
 }
 
-b8 render_view_world_on_build_packet(const struct render_view* self, void* data, struct render_view_packet* out_packet) {
+b8 render_view_world_on_build_packet(const struct render_view* self, struct linear_allocator* frame_allocator, void* data, struct render_view_packet* out_packet) {
     if (!self || !data || !out_packet) {
         KWARN("render_view_world_on_build_packet requires valid pointer to view, packet, and data.");
         return false;
     }
 
-    mesh_packet_data* mesh_data = (mesh_packet_data*)data;
+    geometry_render_data* geometry_data = (geometry_render_data*)data;
     render_view_world_internal_data* internal_data = (render_view_world_internal_data*)self->internal_data;
 
     out_packet->geometries = darray_create(geometry_render_data);
@@ -156,34 +189,31 @@ b8 render_view_world_on_build_packet(const struct render_view* self, void* data,
 
     geometry_distance* geometry_distances = darray_create(geometry_distance);
 
-    for (u32 i = 0; i < mesh_data->mesh_count; ++i) {
-        mesh* m = mesh_data->meshes[i];
-        mat4 model = transform_get_world(&m->transform);
+    u32 geometry_data_count = darray_length(geometry_data);
+    for (u32 i = 0; i < geometry_data_count; ++i) {
+        geometry_render_data* g_data = &geometry_data[i];
+        if(!g_data->geometry) {
+            continue;
+        }
+        
+        // TODO: Add something to material to check for transparency.
+        if ((g_data->geometry->material->diffuse_map.texture->flags & TEXTURE_FLAG_HAS_TRANSPARENCY) == 0) {
+            // Only add meshes with _no_ transparency.
+            darray_push(out_packet->geometries, geometry_data[i]);
+            out_packet->geometry_count++;
+        } else {
+            // For meshes _with_ transparency, add them to a separate list to be sorted by distance later.
+            // Get the center, extract the global position from the model matrix and add it to the center,
+            // then calculate the distance between it and the camera, and finally save it to a list to be sorted.
+            // NOTE: This isn't perfect for translucent meshes that intersect, but is enough for our purposes now.
+            vec3 center = vec3_transform(g_data->geometry->center, g_data->model);
+            f32 distance = vec3_distance(center, internal_data->world_camera->position);
 
-        for (u32 j = 0; j < m->geometry_count; ++j) {
-            geometry_render_data render_data;
-            render_data.geometry = m->geometries[j];
-            render_data.model = model;
+            geometry_distance gdist;
+            gdist.distance = kabs(distance);
+            gdist.g = geometry_data[i];
 
-            // TODO: Add something to material to check for transparency.
-            if ((m->geometries[j]->material->diffuse_map.texture->flags & TEXTURE_FLAG_HAS_TRANSPARENCY) == 0) {
-                // Only add meshes with _no_ transparency.
-                darray_push(out_packet->geometries, render_data);
-                out_packet->geometry_count++;
-            } else {
-                // For meshes _with_ transparency, add them to a separate list to be sorted by distance later.
-                // Get the center, extract the global position from the model matrix and add it to the center,
-                // then calculate the distance between it and the camera, and finally save it to a list to be sorted.
-                // NOTE: This isn't perfect for translucent meshes that intersect, but is enough for our purposes now.
-                vec3 center = vec3_transform(render_data.geometry->center, model);
-                f32 distance = vec3_distance(center, internal_data->world_camera->position);
-
-                geometry_distance gdist;
-                gdist.distance = kabs(distance);
-                gdist.g = render_data;
-
-                darray_push(geometry_distances, gdist);
-            }
+            darray_push(geometry_distances, gdist);
         }
     }
 
@@ -197,6 +227,7 @@ b8 render_view_world_on_build_packet(const struct render_view* self, void* data,
         out_packet->geometry_count++;
     }
 
+    // Clean up.
     darray_destroy(geometry_distances);
 
     return true;
@@ -209,10 +240,10 @@ void render_view_world_on_destroy_packet(const struct render_view* self, struct 
 
 b8 render_view_world_on_render(const struct render_view* self, const struct render_view_packet* packet, u64 frame_number, u64 render_target_index) {
     render_view_world_internal_data* data = self->internal_data;
-    u32 shader_id = data->shader_id;
+    u32 shader_id = data->s->id;
 
     for (u32 p = 0; p < self->renderpass_count; ++p) {
-        renderpass* pass = self->passes[p];
+        renderpass* pass = &self->passes[p];
         if (!renderer_renderpass_begin(pass, &pass->targets[render_target_index])) {
             KERROR("render_view_world_on_render pass index %u failed to start.", p);
             return false;

@@ -10,6 +10,10 @@ bin\x64\Debug\tools.exe buildshaders ^
 ..\Kohi\assets\shaders\Builtin.UIShader.frag.glsl ^
 ..\Kohi\assets\shaders\Builtin.SkyboxShader.vert.glsl ^
 ..\Kohi\assets\shaders\Builtin.SkyboxShader.frag.glsl ^
+..\Kohi\assets\shaders\Builtin.UIPickShader.vert.glsl ^
+..\Kohi\assets\shaders\Builtin.UIPickShader.frag.glsl ^
+..\Kohi\assets\shaders\Builtin.WorldPickShader.vert.glsl ^
+..\Kohi\assets\shaders\Builtin.WorldPickShader.frag.glsl ^
 IF %ERRORLEVEL% NEQ 0 (echo Error:%ERRORLEVEL% && exit)
 
 POPD

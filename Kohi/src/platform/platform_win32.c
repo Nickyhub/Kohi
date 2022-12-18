@@ -340,8 +340,8 @@ b8 kmutex_unlock(kmutex *mutex) {
 // NOTE: End mutexes.
 
 void platform_get_required_extension_names(const char ***names_darray) {
-    const char* extension = &"VK_KHR_win32_surface";
-    darray_push(*names_darray, extension);
+    const char** required_extension = &"VK_KHR_win32_surface";
+    darray_push(*names_darray, required_extension);
 }
 
 // Surface creation for Vulkan

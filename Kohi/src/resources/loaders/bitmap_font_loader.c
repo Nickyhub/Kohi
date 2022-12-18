@@ -292,7 +292,7 @@ static b8 import_fnt_file(file_handle* fnt_file, const char* out_kbf_filename, b
     }
 
     // Now write the binary bitmap font file.
-    return write_kbf_file(out_kbf_filename, out_data);    
+    return write_kbf_file(out_kbf_filename, out_data);
 }
 
 static b8 read_kbf_file(file_handle* file, bitmap_font_resource_data* data) {

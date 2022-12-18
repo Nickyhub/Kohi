@@ -98,7 +98,7 @@ b8 mesh_loader_load(struct resource_loader* self, const char* name, void* params
             // Generate the ksm filename.
             char ksm_file_name[512];
             string_format(ksm_file_name, "%s/%s/%s%s", resource_system_base_path(), self->type_path, name, ".ksm");
-           result = import_obj_file(&f, ksm_file_name, &resource_data);
+            result = import_obj_file(&f, ksm_file_name, &resource_data);
             break;
         }
         case MESH_FILE_TYPE_KSM:
@@ -317,11 +317,11 @@ b8 import_obj_file(file_handle* obj_file, const char* out_ksm_filename, geometry
                     case ' ': {
                         // Vertex position
                         vec3 pos;
-                        char a[2];
+                        char t[2];
                         sscanf(
                             line_buf,
                             "%s %f %f %f",
-                            a,
+                            t,
                             &pos.x,
                             &pos.y,
                             &pos.z);
@@ -331,11 +331,11 @@ b8 import_obj_file(file_handle* obj_file, const char* out_ksm_filename, geometry
                     case 'n': {
                         // Vertex normal
                         vec3 norm;
-                        char b[2];
+                        char t[2];
                         sscanf(
                             line_buf,
                             "%s %f %f %f",
-                            b,
+                            t,
                             &norm.x,
                             &norm.y,
                             &norm.z);
@@ -345,13 +345,13 @@ b8 import_obj_file(file_handle* obj_file, const char* out_ksm_filename, geometry
                     case 't': {
                         // Vertex texture coords.
                         vec2 tex_coord;
-                        char c[4];
+                        char t[2];
 
                         // NOTE: Ignoring Z if present.
                         sscanf(
                             line_buf,
                             "%s %f %f",
-                            c,
+                            t,
                             &tex_coord.x,
                             &tex_coord.y);
 
@@ -365,7 +365,7 @@ b8 import_obj_file(file_handle* obj_file, const char* out_ksm_filename, geometry
                 // face
                 // f 1/1/1 2/2/2 3/3/3  = pos/tex/norm pos/tex/norm pos/tex/norm
                 mesh_face_data face;
-                char d[2];
+                char t[2];
 
                 u64 normal_count = darray_length(normals);
                 u64 tex_coord_count = darray_length(tex_coords);
@@ -374,7 +374,7 @@ b8 import_obj_file(file_handle* obj_file, const char* out_ksm_filename, geometry
                     sscanf(
                         line_buf,
                         "%s %d %d %d",
-                        d,
+                        t,
                         &face.vertices[0].position_index,
                         &face.vertices[1].position_index,
                         &face.vertices[2].position_index);
@@ -382,7 +382,7 @@ b8 import_obj_file(file_handle* obj_file, const char* out_ksm_filename, geometry
                     sscanf(
                         line_buf,
                         "%s %d/%d/%d %d/%d/%d %d/%d/%d",
-                        d,
+                        t,
                         &face.vertices[0].position_index,
                         &face.vertices[0].texcoord_index,
                         &face.vertices[0].normal_index,
@@ -422,8 +422,8 @@ b8 import_obj_file(file_handle* obj_file, const char* out_ksm_filename, geometry
 
                 // usemtl
                 // Read the material name.
-                char e[8];
-                sscanf(line_buf, "%s %s", e, material_names[current_mat_name_count]);
+                char t[8];
+                sscanf(line_buf, "%s %s", t, material_names[current_mat_name_count]);
                 current_mat_name_count++;
             } break;
             case 'g': {
@@ -455,8 +455,8 @@ b8 import_obj_file(file_handle* obj_file, const char* out_ksm_filename, geometry
                 kzero_memory(name, 512);
 
                 // Read the name
-                char f[2];
-                sscanf(line_buf, "%s %s", f, name);
+                char t[2];
+                sscanf(line_buf, "%s %s", t, name);
 
             } break;
         }
@@ -642,7 +642,7 @@ b8 import_obj_material_library_file(const char* mtl_file_path) {
         KERROR("Unable to open mtl file: %s", mtl_file_path);
         return false;
     }
-     
+
     material_config current_config;
     kzero_memory(&current_config, sizeof(current_config));
 
@@ -677,11 +677,11 @@ b8 import_obj_material_library_file(const char* mtl_file_path) {
                     case 'd': {
                         // Ambient/Diffuse colour are treated the same at this level.
                         // ambient colour is determined by the level.
-                        char a[4];
+                        char t[2];
                         sscanf(
                             line,
                             "%s %f %f %f",
-                            a,
+                            t,
                             &current_config.diffuse_colour.r,
                             &current_config.diffuse_colour.g,
                             &current_config.diffuse_colour.b);
@@ -692,19 +692,17 @@ b8 import_obj_material_library_file(const char* mtl_file_path) {
                     } break;
                     case 's': {
                         // Specular colour
-                        char b[4] = {0};
+                        char t[2];
 
                         // NOTE: Not using this for now.
                         f32 spec_rubbish = 0.0f;
                         sscanf(
                             line,
                             "%s %f %f %f",
-                            b,
+                            t,
                             &spec_rubbish,
                             &spec_rubbish,
                             &spec_rubbish);
-                        if (9) {
-                        }
                     } break;
                 }
             } break;
@@ -713,9 +711,9 @@ b8 import_obj_material_library_file(const char* mtl_file_path) {
                 switch (second_char) {
                     case 's': {
                         // Specular exponent
-                        char c[4];
+                        char t[2];
 
-                        sscanf(line, "%s %f", c, &current_config.shininess);
+                        sscanf(line, "%s %f", t, &current_config.shininess);
                     } break;
                 }
             } break;
@@ -829,7 +827,7 @@ b8 write_kmt_file(const char* mtl_file_path, material_config* config) {
     // TODO: Read from config and get an absolute path for output.
     char* format_str = "%s../materials/%s%s";
     file_handle f;
-    char directory[320] = {0};
+    char directory[320];
     string_directory_from_path(directory, mtl_file_path);
 
     char full_file_path[512];
